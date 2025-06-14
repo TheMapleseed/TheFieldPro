@@ -1,12 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { Clock, Mail, Github, Twitter } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Github, Twitter } from 'lucide-react';
 
 const Index = () => {
-  const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -35,14 +31,6 @@ const Index = () => {
 
     return () => clearInterval(timer);
   }, [launchDate]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setIsSubmitted(true);
-      console.log('Email submitted:', email);
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -85,46 +73,10 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Email Signup */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-white mb-4">
-            Be the first to know when we launch
-          </h2>
-          
-          {!isSubmitted ? (
-            <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-              <div className="flex gap-3">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400"
-                  required
-                />
-                <Button 
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Notify Me
-                </Button>
-              </div>
-            </form>
-          ) : (
-            <div className="bg-green-900/20 border border-green-700/50 rounded-lg p-4 max-w-md mx-auto">
-              <p className="text-green-400">
-                ✓ Thanks! We'll notify you when we launch.
-              </p>
-            </div>
-          )}
-        </div>
-
         {/* Description */}
         <div className="mb-12">
-          <p className="text-lg text-slate-300 leading-relaxed">
-            We're working on something special that will change the way you work with code. 
-            Stay tuned for updates and be among the first to experience the future.
+          <p className="text-2xl text-slate-300 leading-relaxed font-medium">
+            MonoRepo for the remote team startup world.
           </p>
         </div>
 
