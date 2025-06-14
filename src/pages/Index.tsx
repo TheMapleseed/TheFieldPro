@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { Github, Twitter } from 'lucide-react';
+import { Twitter } from 'lucide-react';
 
 const Index = () => {
   const [timeLeft, setTimeLeft] = useState({
@@ -81,20 +80,15 @@ const Index = () => {
         </div>
 
         {/* Social Links */}
-        <div className="flex justify-center space-x-6">
+        <div className="flex justify-center">
           <a 
-            href="#" 
+            href="https://x.com/TheMapleseedInc"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-slate-400 hover:text-white transition-colors"
             aria-label="Follow us on Twitter"
           >
             <Twitter className="w-6 h-6" />
-          </a>
-          <a 
-            href="#" 
-            className="text-slate-400 hover:text-white transition-colors"
-            aria-label="Check out our GitHub"
-          >
-            <Github className="w-6 h-6" />
           </a>
         </div>
 
