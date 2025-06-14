@@ -1,174 +1,159 @@
 
-import { useState } from 'react';
-import { Sidebar } from '@/components/Sidebar';
-import { Workspace } from '@/components/Workspace';
-import { ActionHistory } from '@/components/ActionHistory';
-import { UndoRedoControls } from '@/components/UndoRedoControls';
-import { SidebarProvider } from '@/components/ui/sidebar';
-
-export interface Repository {
-  id: string;
-  name: string;
-  files: FileNode[];
-  currentBranch: string;
-  lastModified: Date;
-}
-
-export interface FileNode {
-  id: string;
-  name: string;
-  type: 'file' | 'folder';
-  content?: string;
-  children?: FileNode[];
-  modified: boolean;
-}
-
-export interface Action {
-  id: string;
-  type: 'create' | 'modify' | 'delete' | 'rename';
-  target: string;
-  timestamp: Date;
-  description: string;
-}
+import { useState, useEffect } from 'react';
+import { Clock, Mail, Github, Twitter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const Index = () => {
-  const [repositories] = useState<Repository[]>([
-    {
-      id: '1',
-      name: 'my-awesome-app',
-      currentBranch: 'main',
-      lastModified: new Date(),
-      files: [
-        {
-          id: '1',
-          name: 'src',
-          type: 'folder',
-          modified: false,
-          children: [
-            { id: '2', name: 'components', type: 'folder', modified: false, children: [] },
-            { id: '3', name: 'pages', type: 'folder', modified: true, children: [] },
-            { id: '4', name: 'utils', type: 'folder', modified: false, children: [] },
-          ]
-        },
-        { id: '5', name: 'package.json', type: 'file', modified: false },
-        { id: '6', name: 'README.md', type: 'file', modified: true },
-      ]
-    },
-    {
-      id: '2',
-      name: 'design-system',
-      currentBranch: 'main',
-      lastModified: new Date(Date.now() - 86400000),
-      files: [
-        {
-          id: '7',
-          name: 'components',
-          type: 'folder',
-          modified: false,
-          children: []
-        },
-        { id: '8', name: 'package.json', type: 'file', modified: false },
-      ]
+  const [email, setEmail] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  // Set launch date (30 days from now)
+  const launchDate = new Date();
+  launchDate.setDate(launchDate.getDate() + 30);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = launchDate.getTime() - now;
+
+      if (distance > 0) {
+        setTimeLeft({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000)
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [launchDate]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email) {
+      setIsSubmitted(true);
+      console.log('Email submitted:', email);
     }
-  ]);
-
-  const [currentRepo, setCurrentRepo] = useState<Repository>(repositories[0]);
-  const [actionHistory, setActionHistory] = useState<Action[]>([
-    {
-      id: '1',
-      type: 'modify',
-      target: 'README.md',
-      timestamp: new Date(Date.now() - 300000),
-      description: 'Updated project documentation'
-    },
-    {
-      id: '2',
-      type: 'create',
-      target: 'src/pages/Dashboard.tsx',
-      timestamp: new Date(Date.now() - 600000),
-      description: 'Added dashboard component'
-    },
-    {
-      id: '3',
-      type: 'modify',
-      target: 'src/components/Header.tsx',
-      timestamp: new Date(Date.now() - 900000),
-      description: 'Fixed navigation styling'
-    }
-  ]);
-
-  const [historyIndex, setHistoryIndex] = useState(actionHistory.length - 1);
-
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1);
-      console.log('Undo action:', actionHistory[historyIndex - 1]);
-    }
-  };
-
-  const handleRedo = () => {
-    if (historyIndex < actionHistory.length - 1) {
-      setHistoryIndex(historyIndex + 1);
-      console.log('Redo action:', actionHistory[historyIndex + 1]);
-    }
-  };
-
-  const handleNewAction = (action: Omit<Action, 'id' | 'timestamp'>) => {
-    const newAction: Action = {
-      ...action,
-      id: Date.now().toString(),
-      timestamp: new Date()
-    };
-    
-    const newHistory = [...actionHistory.slice(0, historyIndex + 1), newAction];
-    setActionHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <Sidebar 
-          repositories={repositories} 
-          currentRepo={currentRepo}
-          onRepoSelect={setCurrentRepo}
-        />
-        
-        <main className="flex-1 flex flex-col">
-          <div className="border-b border-slate-700/50 bg-slate-800/50 backdrop-blur-sm">
-            <div className="flex items-center justify-between px-6 py-4">
-              <div className="flex items-center space-x-4">
-                <h1 className="text-2xl font-bold text-white">The Field</h1>
-                <div className="text-slate-400">
-                  <span className="text-slate-500">/</span>
-                  <span className="ml-1">{currentRepo.name}</span>
-                </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="max-w-2xl mx-auto px-6 text-center">
+        {/* Logo/Brand */}
+        <div className="mb-8">
+          <h1 className="text-6xl font-bold text-white mb-4">The Field</h1>
+          <p className="text-xl text-slate-300">
+            Something amazing is coming your way
+          </p>
+        </div>
+
+        {/* Countdown Timer */}
+        <div className="mb-12">
+          <div className="flex justify-center items-center space-x-8 mb-6">
+            <div className="text-center">
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-700/50">
+                <div className="text-3xl font-bold text-white">{timeLeft.days}</div>
+                <div className="text-sm text-slate-400">Days</div>
               </div>
-              
-              <UndoRedoControls
-                canUndo={historyIndex > 0}
-                canRedo={historyIndex < actionHistory.length - 1}
-                onUndo={handleUndo}
-                onRedo={handleRedo}
-              />
+            </div>
+            <div className="text-center">
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-700/50">
+                <div className="text-3xl font-bold text-white">{timeLeft.hours}</div>
+                <div className="text-sm text-slate-400">Hours</div>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-700/50">
+                <div className="text-3xl font-bold text-white">{timeLeft.minutes}</div>
+                <div className="text-sm text-slate-400">Minutes</div>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-700/50">
+                <div className="text-3xl font-bold text-white">{timeLeft.seconds}</div>
+                <div className="text-sm text-slate-400">Seconds</div>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="flex-1 flex">
-            <Workspace 
-              repository={currentRepo}
-              onAction={handleNewAction}
-            />
-            
-            <ActionHistory 
-              actions={actionHistory}
-              currentIndex={historyIndex}
-              onSelectAction={setHistoryIndex}
-            />
-          </div>
-        </main>
+        {/* Email Signup */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold text-white mb-4">
+            Be the first to know when we launch
+          </h2>
+          
+          {!isSubmitted ? (
+            <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+              <div className="flex gap-3">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400"
+                  required
+                />
+                <Button 
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Notify Me
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className="bg-green-900/20 border border-green-700/50 rounded-lg p-4 max-w-md mx-auto">
+              <p className="text-green-400">
+                ✓ Thanks! We'll notify you when we launch.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        <div className="mb-12">
+          <p className="text-lg text-slate-300 leading-relaxed">
+            We're working on something special that will change the way you work with code. 
+            Stay tuned for updates and be among the first to experience the future.
+          </p>
+        </div>
+
+        {/* Social Links */}
+        <div className="flex justify-center space-x-6">
+          <a 
+            href="#" 
+            className="text-slate-400 hover:text-white transition-colors"
+            aria-label="Follow us on Twitter"
+          >
+            <Twitter className="w-6 h-6" />
+          </a>
+          <a 
+            href="#" 
+            className="text-slate-400 hover:text-white transition-colors"
+            aria-label="Check out our GitHub"
+          >
+            <Github className="w-6 h-6" />
+          </a>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-12 pt-8 border-t border-slate-700/50">
+          <p className="text-sm text-slate-500">
+            © 2025 The Field. All rights reserved.
+          </p>
+        </div>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 
