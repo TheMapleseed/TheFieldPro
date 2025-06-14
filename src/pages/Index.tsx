@@ -1,4 +1,5 @@
 
+
 import { Twitter } from 'lucide-react';
 
 const Index = () => {
@@ -35,9 +36,14 @@ const Index = () => {
 
         {/* Footer */}
         <div className="mt-12 pt-8 border-t border-slate-700/50">
-          <p className="text-sm text-slate-500">
-            © 2025 The Field. All rights reserved.
-          </p>
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-slate-500">
+              © 2025 The Field. All rights reserved.
+            </p>
+            <p className="text-sm text-slate-500">
+              The Mapleseed Inc.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -45,3 +51,4 @@ const Index = () => {
 };
 
 export default Index;
+
